@@ -63,6 +63,9 @@
 .hero h2{font-size:clamp(20px,2vw,27px);line-height:1.2;letter-spacing:-.5px}
 .hero-intro{color:var(--blue);font-size:16px;line-height:1.35;margin:10px 0}
 .hero .authors{font-size:13px;line-height:1.5;margin:10px 0 6px;gap:4px 16px}
+.author-link:not([href]){color:inherit;cursor:inherit}
+.author-link{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.contact-link span{color:var(--blue);text-decoration:underline;text-underline-offset:3px}
 .hero .affiliations{font-size:11px;line-height:1.5;margin:6px 0}
 .hero .author-notes{font-size:10px;line-height:1.5}
 .hero .actions.resource-links{max-width:530px;margin:12px auto;gap:10px}
