@@ -19,4 +19,6 @@
 
 **[Project Page](https://lambdahumanoid.github.io/EgoAlign/)**
 
-This repository currently contains the project blog and its media assets in [`docs/`](docs/). Code will be released here in the future.
+This repository currently contains the project blog and its media assets in [`docs/`](docs/).
+
+## **Code will be released here in the future.**
