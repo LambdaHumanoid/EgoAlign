@@ -14,8 +14,9 @@
 <sup>3</sup> Sichuan University ·
 <sup>4</sup> Alibaba Group
 
-† Co-project leaders · ‡ Co-corresponding authors.<br>
-\* Work done during an internship with Alibaba Group.
+\* Work done during an internship at Alibaba Token Hub (ATH), Alibaba Group.
+
+† Co-project leaders · ‡ Co-corresponding authors.
 
 **[Project Page](https://lambdahumanoid.github.io/EgoAlign/)** · **[Paper (arXiv)](https://arxiv.org/abs/2609.38046)**
 

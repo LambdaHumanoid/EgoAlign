@@ -128,3 +128,11 @@
 @media(min-width:641px){.hero-film:has(.video-player){width:min(100%,calc(clamp(220px,100svh - 566px,480px) * 16 / 9))}}
 @media(max-width:640px){.video-player{border-radius:5px}}
 @media(max-width:400px){.video-controls{gap:2px;padding:0 4px}.video-controls button{flex-basis:32px}.video-seek{margin:0 4px}.video-time{font-size:10px}}
+
+/* Institutional branding and internship attribution. */
+.brand-group{display:flex;align-items:center;gap:18px}
+.lab-brand{display:flex;align-items:center;gap:8px;padding-right:18px;border-right:1px solid var(--line);font-size:13px;font-weight:600;white-space:nowrap}
+.lab-brand img{display:block;width:30px;height:30px}
+.internship-note{font-size:11px;line-height:1.6;color:var(--muted);margin:8px auto;max-width:650px}
+.internship-note sup{color:var(--blue)}
+@media(max-width:640px){.brand-group{gap:10px}.lab-brand{padding-right:10px}.lab-brand img{width:25px;height:25px}.internship-note{font-size:10px;max-width:340px}}
