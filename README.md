@@ -17,8 +17,23 @@
 † Co-project leaders · ‡ Co-corresponding authors.<br>
 \* Work done during an internship with Alibaba Group.
 
-**[Project Page](https://lambdahumanoid.github.io/EgoAlign/)**
+**[Project Page](https://lambdahumanoid.github.io/EgoAlign/)** · **[Paper (arXiv)](https://arxiv.org/abs/2609.38046)**
 
 This repository currently contains the project blog and its media assets in [`docs/`](docs/).
 
 ## **Code will be released here in the future.**
+
+## Citation
+
+```bibtex
+@misc{jiang2026egoalign,
+  title = {{EgoAlign}: Bridging the Human-Humanoid Gap for Long-Range Loco-Manipulation},
+  author = {Yiming Jiang and Jin Chen and Chongyang Xu and
+            Yilun Chen and Aimin Hao and Yisheng He},
+  year = {2026},
+  eprint = {2609.38046},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.RO},
+  url = {https://arxiv.org/abs/2609.38046}
+}
+```
