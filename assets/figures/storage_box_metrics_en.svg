@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="46" viewBox="0 0 600 46" role="img" aria-labelledby="title">
+  <title id="title">Mean palm error ↓ | Before: 10.02 cm | After: 1.35 cm</title>
+  <style>
+    text { fill: #1f2328; }
+    .border { stroke: #d1d9e0; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #f0f6fc; }
+      .border { stroke: #3d444d; }
+    }
+  </style>
+  <path class="border" d="M0.5 0.5H599.5V45.5H0.5Z M200 0V46 M400 0V46" fill="none"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="16" text-anchor="middle">
+    <text x="100" y="29">Mean palm error ↓</text>
+    <text x="300" y="29">Before: 10.02 cm</text>
+    <text x="500" y="29">After: <tspan font-weight="600">1.35 cm</tspan></text>
+  </g>
+</svg>
