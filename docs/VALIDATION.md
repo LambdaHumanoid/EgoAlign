@@ -40,7 +40,8 @@ missing captures with offline staging tokens.
 ## Interpret the outputs
 
 - Select the replay recorded in `final_decision.json` (`accepted_round`);
-  early stopping means it is not always Round 2. Replay-only uses `baseline_replay`.
+  it is not always Round 2. A `selected_round` without an `accepted_round` is only
+  a diagnostic result and cannot be promoted. Replay-only uses `baseline_replay`.
 - Read measured endpoint errors from replay evaluation, not candidate FK error.
   Record the active-frame selection, temporal compensation and units when
   comparing runs. README metrics refer to their accompanying demonstration videos.

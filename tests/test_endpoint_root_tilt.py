@@ -86,6 +86,13 @@ def test_measured_fk_retains_root_tilt_and_waist_but_not_heading(tmp_path):
     np.savez(control, joint_names=names, measured_joint_names=names,
              body_q_measured=q, base_quat_measured=roots, format_version=4)
     endpoints, info = measured_endpoints_from_control(control, xml, grounded=True)
+    from egoalign.palm_replay import measured_poses
+    positions, rotations = measured_poses(q, roots, names, xml)
+    np.testing.assert_allclose(positions[:, 0], endpoints["hand_left"], atol=1e-12)
+    np.testing.assert_allclose(positions[:, 1], endpoints["hand_right"], atol=1e-12)
+    np.testing.assert_allclose(rotations[1], rotations[2], atol=1e-12)
+    assert not np.allclose(rotations[0], rotations[1])
+    assert not np.allclose(rotations[0], rotations[3])
     for side in ("hand_left", "hand_right"):
         assert np.linalg.norm(endpoints[side][1] - endpoints[side][0]) > .02
         np.testing.assert_allclose(endpoints[side][1], endpoints[side][2], atol=1e-12)

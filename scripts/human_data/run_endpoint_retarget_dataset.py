@@ -3323,6 +3323,8 @@ def update_dataset_summary(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--alignment-method", choices=("paper", "palm"), default="paper",
+                        help="paper (default) reproduces the paper method; palm adds palm-orientation preservation")
     parser.add_argument("--raw-dataset", type=Path, required=True)
     parser.add_argument("--baseline-dataset", type=Path, required=True)
     parser.add_argument(
@@ -3400,6 +3402,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
     validate_replay_workers(args.workers)
+    if args.alignment_method == "palm":
+        from egoalign.palm_alignment import run
+        return run(args)
     if args.mode == "capacity" and args.workers != 4:
         raise ContractError("capacity mode requires --workers 4 and a compatible custom replay driver")
     if not np.isfinite(args.canonical_head_height_m) or args.canonical_head_height_m <= 0:

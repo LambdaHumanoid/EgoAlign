@@ -12,7 +12,7 @@ from egoalign.io_safety import validate_output_root
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def plan(sample, raw, output, robot_xml, python):
+def plan(sample, raw, output, robot_xml, python, alignment_method="paper"):
     if sample != "basket":
         raise ValueError("The public sample is Object Relocation (basket)")
     cli = [str(python), "-m", "egoalign"]
@@ -31,7 +31,7 @@ def plan(sample, raw, output, robot_xml, python):
                       "--baseline-contract", "minimal_ab", "--baseline-replay-root", str(replay),
                       "--output-root", str(output / "alignment"), "--mode", "smoke", "--episodes", "0",
                       "--workers", "1", "--state-json", str(output / "state.json"),
-                      "--morphology", str(morphology)],
+                      "--morphology", str(morphology), "--alignment-method", alignment_method],
                cli + ["promote", "--baseline", str(stage), "--batch-root", str(output / "alignment"),
                       "--output", str(output / "final")]]
     return result
@@ -44,6 +44,8 @@ def main():
     p.add_argument("--output-root", required=True, type=Path)
     p.add_argument("--robot-xml", type=Path, help="Exact simulation G1 model XML for FK calibration")
     p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--alignment-method", choices=("paper", "palm"), default="paper",
+                   help="paper (default) reproduces the paper method; palm adds palm-orientation preservation")
     a = p.parse_args()
     raw, output = a.raw_root.expanduser().resolve(), a.output_root.expanduser().resolve()
     try:
@@ -53,7 +55,7 @@ def main():
     if a.robot_xml is None:
         p.error("basket requires --robot-xml matching the replay scene")
     commands = plan(a.sample, raw, output, a.robot_xml.expanduser().resolve(),
-                    os.environ.get("EGOALIGN_DATA_PYTHON", sys.executable))
+                    os.environ.get("EGOALIGN_DATA_PYTHON", sys.executable), a.alignment_method)
     if a.dry_run:
         print(json.dumps(commands, indent=2))
         return 0

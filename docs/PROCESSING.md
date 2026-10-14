@@ -23,9 +23,19 @@ Both retain causal controller history and export the same 43D state and captured
 
 ## Endpoint alignment
 
-SMPL/Pico-derived reference → canonical scale and wrist cleanup → bilateral
-geometric alignment (Round 0) → measured SONIC–MuJoCo residual refinement (Rounds
-1/2) → final causal state and same-control-tick motion-token export.
+Choose the method with `--alignment-method` (also supported by the sample recipe):
+
+- `paper` (default): canonical scale and wrist cleanup → bilateral geometric alignment
+  (Round 0) → measured position-residual refinement (Rounds 1/2).
+- `palm` (optional): initialize with position alignment, then run three measured
+  position-and-orientation refinement rounds. The orientation reference is the
+  **unoptimized robot replay at each source frame**, not a constant hand angle.
+  Preserving orientation may increase mean endpoint position error by approximately
+  **1–2 cm**, depending on the task.
+
+Both finish with causal state and same-control-tick motion-token export. The
+`palm` method keeps its initialization under `paper_alignment/` and its own
+rounds under `episode_*/round_*/`; these are distinct artifacts.
 
 Wrist cleanup precedes optimization. Each candidate is validated before replay;
 geometric candidate error is distinct from measured controller error. SONIC
@@ -88,10 +98,19 @@ simulation. Use the runtime/asset environment configured in the installation gui
 After checking assets, libraries and unused ports, set
 `EGOALIGN_ALLOW_SIM_REPLAY=1`. Reuse the arguments above with
 `--mode smoke --episodes <one-compact-id>` and remove `--dry-run`. Inspect the
-smoke before using `--mode full`; use `--resume` when continuing existing work.
-Early stopping may select Round 0 or Round 1. Promote the `accepted_round`
-recorded in `final_decision.json`; see `python -m egoalign promote --help`.
+smoke before using `--mode full`. `--resume` revalidates completed palm runs;
+an interrupted palm episode requires a fresh output directory. Paper runs support
+round-level resume and early stopping. The `palm` method selects a stable whole
+round with the smallest orientation drift among candidates within 1 cm of the
+paper seed's mean position error. Strict endpoint checks still determine
+acceptance; a diagnostic `selected_round` is not necessarily accepted.
+Promote only the `accepted_round` recorded in `final_decision.json`;
+see `python -m egoalign promote --help`.
 Stage-A output alone is not train-ready.
+
+The low-level `candidate`, `evaluate`, and `audit` commands operate on paper-method
+archives. Use `endpoint-align` for either method's complete validation and
+feedback loop. `promote` reads the method from the batch manifest.
 
 ## Replay only
 

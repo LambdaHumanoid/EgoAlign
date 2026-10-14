@@ -28,6 +28,11 @@ unretargeted replay, bilateral alignment/refinement and promotion.
 Acceptance checks determine the final round. A failed step stops the recipe;
 inspect its logs before retrying.
 
+The default `paper` method uses the paper's position-alignment algorithm.
+Add `--alignment-method palm` to also preserve the original replay's per-frame
+palm orientations. This may increase mean endpoint position error by approximately
+1–2 cm, depending on the task. Use a different output directory for each method.
+
 ## Optional replay only: bring your own input
 
 Supply your own schema-compatible dataset and its camera alignment metadata.

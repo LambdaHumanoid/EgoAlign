@@ -20,6 +20,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
@@ -408,6 +409,9 @@ def accepted_decisions(batch_root: Path) -> tuple[list[dict[str, Any]], list[dic
             PICO_WRIST_GRASP_MAX_UPSTREAM_RESIDUAL_DEG
         ),
     }
+    if summary.get("alignment_method") == "palm":
+        from egoalign.palm_alignment import identity
+        expected_identity = identity()
     for key, expected in expected_identity.items():
         if summary.get(key) != expected:
             raise PromotionError(
@@ -582,6 +586,13 @@ def promote(args: argparse.Namespace) -> None:
         ENDPOINT_PARTS_HANDS, hand_endpoint_side
     )
     endpoint_version = "egoalign"
+    palm_method = batch_summary.get("alignment_method") == "palm"
+    wrist_policy, orientation_policy = WRIST_LOCAL_ROTATION_POLICY, VR3PT_ORIENTATION_POLICY
+    if palm_method:
+        from egoalign.palm_alignment import identity, validate_candidate
+        endpoint_contract = SimpleNamespace(**identity())
+        wrist_policy = endpoint_contract.wrist_local_rotation_policy
+        orientation_policy = endpoint_contract.vr3pt_orientation_policy
     selected = parse_episode_selection(args.episodes)
     if selected is not None:
         accepted_ids = {int(item["compact_episode"]) for item in accepted}
@@ -627,11 +638,14 @@ def promote(args: argparse.Namespace) -> None:
                     raise PromotionError(f"accepted episode {compact} has no accepted round")
                 round_dir = batch_root / f"episode_{compact:06d}/round_{round_index:02d}"
                 staging_source = round_dir / "staging"
-                replay, replay_override = select_promotion_replay(
-                    round_dir, expected_algorithm=endpoint_contract.algorithm
-                )
+                if palm_method:
+                    replay, replay_override = round_dir / "replay", None
+                else:
+                    replay, replay_override = select_promotion_replay(
+                        round_dir, expected_algorithm=endpoint_contract.algorithm
+                    )
                 contract = load_json(round_dir / "round_contract.json")
-                round_identity = promotion_round_identity(hand_endpoint_side)
+                round_identity = identity() if palm_method else promotion_round_identity(hand_endpoint_side)
                 for key, expected in round_identity.items():
                     if contract.get(key) != expected:
                         raise PromotionError(
@@ -645,7 +659,7 @@ def promote(args: argparse.Namespace) -> None:
                 baseline_parquet = format_episode_path(
                     baseline, data_template, compact, chunks
                 )
-                candidate_contract = validate_promotion_candidate(
+                candidate_contract = (validate_candidate if palm_method else validate_promotion_candidate)(
                     round_dir,
                     baseline_parquet,
                     staging_source / "data/chunk-000/episode_000000.parquet",
@@ -760,10 +774,10 @@ def promote(args: argparse.Namespace) -> None:
                 "endpoint_retarget_endpoint_definition": endpoint_contract.endpoint_definition,
                 "endpoint_retarget_hand_endpoint_side": hand_endpoint_side,
                 "endpoint_retarget_wrist_local_rotation_policy": (
-                    WRIST_LOCAL_ROTATION_POLICY
+                    wrist_policy
                 ),
                 "endpoint_retarget_vr3pt_orientation_policy": (
-                    VR3PT_ORIENTATION_POLICY
+                    orientation_policy
                 ),
                 "endpoint_retarget_wrist_false_grasp_repair_policy": (
                     PICO_FALSE_GRASP_WRIST_REPAIR_POLICY
@@ -783,6 +797,7 @@ def promote(args: argparse.Namespace) -> None:
         write_json(temporary / "meta/info.json", info)
         write_json(temporary / "meta/processing_mode.json", {
             "processing_mode": "endpoint-align",
+            "alignment_method": "palm" if palm_method else "paper",
             "endpoint_optimization": True,
             "history": "causal_measured",
             "motion_token": "same_tick_cpp_capture",
@@ -813,8 +828,8 @@ def promote(args: argparse.Namespace) -> None:
                 "endpoint_definition": endpoint_contract.endpoint_definition,
                 "endpoint_target_contract": endpoint_contract.endpoint_target_contract,
                 "hand_endpoint_side": hand_endpoint_side,
-                "wrist_local_rotation_policy": WRIST_LOCAL_ROTATION_POLICY,
-                "vr3pt_orientation_policy": VR3PT_ORIENTATION_POLICY,
+                "wrist_local_rotation_policy": wrist_policy,
+                "vr3pt_orientation_policy": orientation_policy,
                 "wrist_false_grasp_repair_policy": (
                     PICO_FALSE_GRASP_WRIST_REPAIR_POLICY
                 ),

@@ -63,14 +63,19 @@ Turn compatible human demonstrations into **G1 robot-learning data**:
 - [x] Causal replay with controller history for paired states and motion tokens.
 - [x] Object Relocation example, visualization, and endpoint evaluation.
 - [x] Additional task comparison videos.
+- [ ] VLA training recipes — potential future release; currently refer to [OpenPI](https://github.com/Physical-Intelligence/openpi).
 
-Choose `endpoint-align` for alignment and refinement, or `replay-only` for direct
-causal replay. Both export **43D states** paired with **64D motion tokens** and
-two 6D hand commands (**76D actions**) for downstream VLA training.
-See the [processing guide](docs/PROCESSING.md) for commands.
+| Processing mode | Description |
+|---|---|
+| `endpoint-align` | Palm alignment and replay-based refinement |
+| `replay-only` | Direct causal replay |
 
-We may release our VLA training recipes in the future. For now, refer to
-[OpenPI](https://github.com/Physical-Intelligence/openpi) for VLA training.
+Both export paired **43D states + 76D actions** (64D motion tokens and two 6D hand
+commands). See the [processing guide](docs/PROCESSING.md).
+
+> **Alignment options:** `paper` is the default and matches the paper and examples below.
+> Add `--alignment-method palm` to preserve palm orientation, with a possible
+> **1–2 cm increase in mean endpoint position error**, depending on the task.
 
 
 
@@ -88,14 +93,11 @@ python -m egoalign endpoint-align --help
 python -m egoalign replay-only --help
 ```
 
-Next, configure the replay environment. Stage A/C require compatible LeRobot and Pinocchio installations;
-CUDA PyTorch must match your environment. Configure the pinned public SONIC
-runtime using the [runtime setup and patch guide](docs/public_runtime.md).
-The same guide covers native execution and running the launcher in your own GPU container.
+### Configure & Verify
 
-Configure the pinned human skeleton, BrainCo robot assets, and controller weights using
-the [external asset guide](docs/EXTERNAL_ASSETS.md), then follow the
-[validation guide](docs/VALIDATION.md) to check your setup and processed data.
+1. **Replay environment** — Follow the [runtime setup guide](docs/public_runtime.md) for native or GPU-container execution. Check [dependencies](docs/DEPENDENCIES.md) for Python and CUDA compatibility.
+2. **Models & assets** — Configure the human skeleton, BrainCo robot assets, and controller weights using the [asset guide](docs/EXTERNAL_ASSETS.md).
+3. **Validation** — Follow the [validation guide](docs/VALIDATION.md) to verify your environment and processed data.
 
 
 
@@ -203,13 +205,6 @@ tests/               Automated tests
 docs/                Processing, runtime, data-contract, and validation guides
 assets/              Paper figure, task videos, and measurement records
 ```
-
-The SONIC controller and MuJoCo replay runner are installed separately via the
-[runtime guide](docs/public_runtime.md). The local adapter contains their data
-interfaces; geometry, robot and dataset utilities live in their own modules.
-The pipelines call `tools/run_sim_replay.sh` to forward replay requests to
-`EGOALIGN_REPLAY_DRIVER`. Configure it via the runtime guide, then use the Python
-commands above; you do not need to invoke this adapter directly.
 
 ## 📘 Documentation
 

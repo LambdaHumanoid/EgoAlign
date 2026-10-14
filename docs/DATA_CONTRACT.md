@@ -85,9 +85,18 @@ use the builder's `full` selection mode without a second crop.
 
 ## Endpoint alignment
 
-Round 0 performs geometric dual-palm alignment; Rounds 1/2 refine targets using
-actual SONIC–MuJoCo replay residuals. Both hands use the implementation's temporal
-alignment, smoothing, gain estimation and correction clipping. The interaction
+The default `paper` method uses geometric dual-palm alignment in Round 0 and actual
+SONIC–MuJoCo position residuals in Rounds 1/2. The optional `palm` method initializes
+from that result and adds three position-and-orientation feedback rounds.
+Its orientation target is the unoptimized robot's measured per-frame wrist-frame
+orientation; position targets remain the same four-MCP palm centers.
+
+The `palm` method samples simulation telemetry at source time plus 0.24 simulation
+seconds, with linear position interpolation and rotation SLERP. All variants use
+the same valid-frame intersection; extrapolated samples are excluded. It smooths
+valid residuals with a Gaussian filter (sigma 2 frames) and records correction
+parameters in the output. The paper method retains its temporal alignment,
+smoothing, gain estimation and correction clipping. The interaction
 frame removes heading (yaw) only, retains root pitch and roll, centers x/y on
 the pelvis, and sets z relative to the lower foot at each frame. Human targets
 use the source root orientation; robot palms use same-tick measured pelvis
@@ -97,6 +106,11 @@ before optimization. SONIC reference arrays remain body-local; their separate
 root orientation is unchanged. Evaluation and residual smoothing do not retime
 camera frames or exported training rows. Cached candidates and corrections
 must carry the current coordinate-frame contract; older results require rebuilding.
+
+For `palm` candidates, SMPL wrist rotations, explicit hand orientations and derived
+wrist-joint fields are updated together. Head orientation, root orientation,
+finger commands and timestamps are preserved. Method identities and artifact
+hashes prevent reuse across different candidate contracts.
 
 Actual robot palms use MuJoCo FK wrist-yaw anchors with explicit offsets
 `[0.0415, +0.003, 0]` / `[0.0415, -0.003, 0]` m. Preserve model and offset identity.

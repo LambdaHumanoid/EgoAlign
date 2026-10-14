@@ -56,10 +56,17 @@
 - [x] 带控制器历史状态的因果回放，生成配对状态与 motion token。
 - [x] 物体转运样例、可视化与末端精度评估。
 - [x] 更多任务的对比视频。
+- [ ] VLA 训练方案 — 未来可能公开；目前可参考 [OpenPI](https://github.com/Physical-Intelligence/openpi)。
 
-选择 `endpoint-align` 进行对齐与迭代，或选择 `replay-only` 直接进行因果回放。两种模式均导出配对的 **43D state**、**64D motion token** 和双手各 6D 指令（合计 **76D action**），供下游 VLA 训练使用。命令见[处理指南](docs/PROCESSING.md)。
+| 处理模式 | 说明 |
+|---|---|
+| `endpoint-align` | 掌心对齐与回放残差优化 |
+| `replay-only` | 直接进行因果回放 |
 
-我们可能会在后续公开 VLA 训练方案。目前可参考 [OpenPI](https://github.com/Physical-Intelligence/openpi) 进行 VLA 训练。
+两种模式均导出配对的 **43D state + 76D action**（64D motion token 和双手各 6D 指令）。命令见[处理指南](docs/PROCESSING.md)。
+
+> **对齐选项：** 默认使用 `paper`，与论文及下方示例一致。
+> 添加 `--alignment-method palm` 可保持掌心朝向，但平均末端位置误差可能增加约 **1–2 cm**，具体取决于任务。
 
 ## 🛠️ 安装
 
@@ -76,11 +83,11 @@ python -m egoalign endpoint-align --help
 python -m egoalign replay-only --help
 ```
 
-随后配置仿真环境：Stage A/C 需要兼容的 LeRobot 和 Pinocchio；CUDA PyTorch 需匹配运行环境。
+### 配置与验证
 
-按[公开 SONIC 运行时与补丁指南](docs/public_runtime.md)配置仿真，支持原生环境或在用户自备的 GPU 容器内运行启动器。固定版本的人体骨架、BrainCo 模型资产和控制器权重的获取、路径与检查方式见[外部资产配置](docs/EXTERNAL_ASSETS.md)。
-
-配置完成后，按[验证指南](docs/VALIDATION.md)检查运行环境和处理后的数据。
+1. **回放环境** — 按[运行时配置指南](docs/public_runtime.md)配置原生环境或 GPU 容器。Python 与 CUDA 兼容要求见[依赖说明](docs/DEPENDENCIES.md)。
+2. **模型与资产** — 按[资产指南](docs/EXTERNAL_ASSETS.md)配置人体骨架、BrainCo 模型资产和控制器权重。
+3. **验证** — 按[验证指南](docs/VALIDATION.md)检查运行环境和处理后的数据。
 
 ## 📦 长距离移动操作样例
 
@@ -182,11 +189,6 @@ tools/               运行时配置、回放适配与验证工具
 tests/               自动化测试
 docs/                处理流程、运行环境、数据契约与验证指南
 ```
-
-SONIC 控制器与 MuJoCo 回放程序按照[运行时指南](docs/public_runtime.md)单独安装。
-本地适配模块保存与它们交互的数据接口；几何计算、机器人模型和数据工具分别组织。
-处理流程通过 `tools/run_sim_replay.sh` 将回放请求转交给 `EGOALIGN_REPLAY_DRIVER`。
-按运行时指南完成配置后，使用上面的 Python 命令即可，无需直接执行这个适配脚本。
 
 ## 📘 文档与检查
 
