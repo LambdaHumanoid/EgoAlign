@@ -46,6 +46,11 @@ converted into paired state–action supervision for VLA fine-tuning.
 
 
 
+## 📰 News
+
+- **2026-10-15** — We add optional palm-orientation alignment! It better preserves palm orientation during motion retargeting.
+- **2026-10-14** — We release the EgoAlign data processing pipeline!
+
 ## ⭐ Key Highlights
 
 - **Human-only demonstrations** for long-range loco-manipulation.
